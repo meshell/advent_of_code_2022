@@ -35,7 +35,6 @@ defmodule Day4 do
       false
       iex> [{2, 4}, {6, 8}] |> Day4.contains_assignments()
       false
-
   """
   def contains_assignments([{min_1, max_1}, {min_2, max_2}])
       when min_2 >= min_1 and max_2 <= max_1 do
@@ -47,7 +46,7 @@ defmodule Day4 do
     true
   end
 
-  def contains_assignments(x) do
+  def contains_assignments(_) do
     false
   end
 
@@ -58,12 +57,53 @@ defmodule Day4 do
     |> Enum.count(&(&1 == true))
   end
 
+  @doc """
+  Assignment overlapp
+  Check if one assigment overlaps the other
+
+  ## Examples
+
+      iex> [{2, 4}, {6, 8}] |> Day4.assignments_overlap()
+      false
+      iex> [{2, 3}, {4, 5}] |> Day4.assignments_overlap()
+      false
+      iex> [{2, 8}, {3, 7}] |> Day4.assignments_overlap()
+      true
+      iex> [{6, 6}, {4, 6}] |> Day4.assignments_overlap()
+      true
+      iex> [{2, 6}, {4, 8}] |> Day4.assignments_overlap()
+      true
+      iex> [{4, 8}, {2, 6}] |> Day4.assignments_overlap()
+      true
+  """
+  def assignments_overlap([{min_1, max_1}, {min_2, _}])
+      when min_2 >= min_1 and min_2 <= max_1 do
+    true
+  end
+
+  def assignments_overlap([{min_1, _}, {min_2, max_2}])
+      when min_1 >= min_2 and min_1 <= max_2 do
+    true
+  end
+
+  def assignments_overlap(_) do
+    false
+  end
+
+  def count_overlapping_assignments(input) do
+    input
+    |> parse_assignments()
+    |> Enum.map(&Day4.assignments_overlap/1)
+    |> Enum.count(&(&1 == true))
+  end
+
   def main(args) do
     {options, _, _} = OptionParser.parse(args, strict: [part: :integer])
 
     case options do
-      [part: 1] -> count_fully_overlapping_assignments(Input.get_input()) |> IO.inspect()
-      _ -> false
+      [part: 1] -> count_fully_overlapping_assignments(Input.get_input())
+      _ -> count_overlapping_assignments(Input.get_input())
     end
+    |> IO.inspect()
   end
 end
