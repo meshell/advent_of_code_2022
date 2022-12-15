@@ -75,8 +75,53 @@ defmodule Day3 do
     |> Enum.reduce(0, fn x, acc -> priority(x) + acc end)
   end
 
-  def main(_args) do
-    priority_sum(Input.get_input())
-    |> IO.inspect()
+  @doc """
+  Group rucksack contents into groups of three
+
+  ## Examples
+
+      iex> "vJrwpWtwJgWrhcsFMMfFFhFp\\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\\nPmmdzqPrVvPwwTWBwg\\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\\nttgJtRGJQctTZtZT\\nCrZsJsPPZsGzwwsLwLmpwMDw" |> Day3.group_rucksacks()
+      [["vJrwpWtwJgWrhcsFMMfFFhFp", "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL", "PmmdzqPrVvPwwTWBwg"], ["wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn", "ttgJtRGJQctTZtZT", "CrZsJsPPZsGzwwsLwLmpwMDw"]]
+
+  """
+  def group_rucksacks(input) do
+    input
+    |> String.split("\n", trim: true)
+    |> Enum.chunk_every(3)
+  end
+
+  @doc """
+  Group rucksack contents into groups of three
+
+  ## Examples
+
+      iex> ["vJrwpWtwJgWrhcsFMMfFFhFp", "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL", "PmmdzqPrVvPwwTWBwg"] |> Day3.find_common_item()
+      ["r"]
+
+  """
+  def find_common_item([rucksack_1, rucksack_2, rucksack_3]) do
+    MapSet.intersection(
+      MapSet.new(String.graphemes(rucksack_1)),
+      MapSet.new(String.graphemes(rucksack_2))
+    )
+    |> MapSet.intersection(MapSet.new(String.graphemes(rucksack_3)))
+    |> MapSet.to_list()
+  end
+
+  def badge_priority_sum(input) do
+    input
+    |> group_rucksacks()
+    |> Enum.map(fn x -> find_common_item(x) end)
+    |> List.flatten()
+    |> Enum.reduce(0, fn x, acc -> priority(x) + acc end)
+  end
+
+  def main(args) do
+    {options, _, _} = OptionParser.parse(args, strict: [part: :integer])
+
+    case options do
+      [part: 1] -> priority_sum(Input.get_input()) |> IO.inspect()
+      _ -> badge_priority_sum(Input.get_input()) |> IO.inspect()
+    end
   end
 end
