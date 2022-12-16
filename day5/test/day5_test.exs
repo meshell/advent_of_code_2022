@@ -54,7 +54,11 @@ defmodule Day5Test do
     move 1 from 1 to 2
     """
 
-    assert Day5.rearrange(start_stack, procedures) == [["C"], ["M"], ["Z", "N", "D", "P"]]
+    assert Day5.rearrange(start_stack, procedures, :cratemover9000) == [
+             ["C"],
+             ["M"],
+             ["Z", "N", "D", "P"]
+           ]
   end
 
   test "get top of stack" do
@@ -82,5 +86,21 @@ defmodule Day5Test do
     """
 
     assert Day5.get_top_of_rearrange_stack(input) == "CMZ"
+  end
+
+  test "get top of rearrange stack with CrateMover 9001" do
+    input = """
+        [D]
+    [N] [C]
+    [Z] [M] [P]
+    1   2   3
+
+    move 1 from 2 to 1
+    move 3 from 1 to 3
+    move 2 from 2 to 1
+    move 1 from 1 to 2
+    """
+
+    assert Day5.get_top_of_rearrange_stack(input, :cratemover9001) == "MCD"
   end
 end

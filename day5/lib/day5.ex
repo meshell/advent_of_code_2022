@@ -89,12 +89,40 @@ defmodule Day5 do
     |> List.update_at(to - 1, &(&1 = new_to_stack))
   end
 
+  def rearrange_once(stack, moves, :cratemover9000) do
+    rearrange_once(stack, moves)
+  end
+
+  def rearrange_once(stack, {no_item, from, to}, :cratemover9001) do
+    [new_from_stack, new_to_stack] =
+      move_from_to_once(no_item, Enum.at(stack, from - 1), Enum.at(stack, to - 1))
+
+    stack
+    |> List.update_at(from - 1, &(&1 = new_from_stack))
+    |> List.update_at(to - 1, &(&1 = new_to_stack))
+  end
+
   @doc """
   Rearrange the stack
   """
-  def rearrange(stack, procedures) do
+  def rearrange(stack, procedures, mover) do
     parse_rearrangement_procedures(procedures)
-    |> List.foldl(stack, fn p, s -> rearrange_once(s, p) end)
+    |> List.foldl(stack, fn p, s -> rearrange_once(s, p, mover) end)
+  end
+
+  @doc """
+  Move n elements from one stack to other at once
+    ## Examples
+
+      iex> Day5.move_from_to_once(1, ["D", "C", "M"], ["N", "Z"])
+      [["C", "M"], ["D", "N", "Z"]]
+
+      iex> Day5.move_from_to_once(2, ["D", "C", "M"], ["N", "Z"])
+      [["M"], [ "D", "C", "N", "Z"]]
+  """
+  def move_from_to_once(n, from, to) do
+    to_move = Enum.take(from, n)
+    [Enum.drop(from, n), to_move ++ to]
   end
 
   @doc """
@@ -124,13 +152,17 @@ defmodule Day5 do
   """
   def top_of_stacks(stack) do
     stack
-    |> Enum.reduce("", fn [h | t], acc -> acc <> h end)
+    |> Enum.reduce("", fn [h | _], acc -> acc <> h end)
   end
 
   def get_top_of_rearrange_stack(input) do
+    get_top_of_rearrange_stack(input, :cratemover9000)
+  end
+
+  def get_top_of_rearrange_stack(input, mover) do
     [stack, procedures] = parse(input)
 
-    rearrange(parse_stack_drawing(stack), procedures)
+    rearrange(parse_stack_drawing(stack), procedures, mover)
     |> top_of_stacks()
   end
 
@@ -138,8 +170,11 @@ defmodule Day5 do
     {options, _, _} = OptionParser.parse(args, strict: [part: :integer])
 
     case options do
+      [part: 1] ->
+        get_top_of_rearrange_stack(Input.get_input(), :cratemover9000)
+
       _ ->
-        get_top_of_rearrange_stack(Input.get_input())
+        get_top_of_rearrange_stack(Input.get_input(), :cratemover9001)
     end
     |> IO.inspect()
   end
