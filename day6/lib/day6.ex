@@ -2,24 +2,21 @@ defmodule Day6 do
   @moduledoc """
   Documentation for Day6.
   """
-  def find_marker_window({x, []}, m) do
-    {x, []}
+
+  def find_marker({x, y}, :start_of_message) do
+    find_marker({x, y}, 14)
   end
 
-  def find_marker_window({x, y}, m) do
-    [h | tail] = y
+  def find_marker({x, y}, :start_of_packet) do
+    find_marker({x, y}, 4)
+  end
 
-    n =
-      if m == :start_of_message do
-        14
-      else
-        4
-      end
-
-    if length(Enum.take(y, n)) == length(Enum.uniq(Enum.take(y, n))) do
-      {x ++ Enum.take(y, n), []}
+  def find_marker({marker, remaining_input}, n) do
+    if length(Enum.take(remaining_input, n)) == length(Enum.uniq(Enum.take(remaining_input, n))) do
+      length(marker) + n
     else
-      {x ++ [h], tail}
+      [h | tail] = remaining_input
+      find_marker({marker ++ [h], tail}, n)
     end
   end
 
@@ -43,13 +40,9 @@ defmodule Day6 do
       19
   """
   def find_marker(input, m) do
-    input_list =
-      input
-      |> String.codepoints()
-
-    input_list
-    |> Enum.reduce({[], input_list}, fn _, acc -> find_marker_window(acc, m) end)
-    |> (fn {x, _} -> length(x) end).()
+    {[]}
+    |> Tuple.append(String.codepoints(input))
+    |> find_marker(m)
   end
 
   def main(args) do
